@@ -7116,6 +7116,7 @@ window.addEventListener("load", function () {
                             (elem.querySelector("#game-start-text") as HTMLElement).textContent = formatJSString(getString("appScreenTeamplayGameStart"), teamNum);
                             resetForElement(parent, elem);
                             (elem.querySelector("#game-start-button") as HTMLElement).onclick = function () {
+                                onlineConnection.autoJoin = false;
                                 onlineConnection.send("start");
                             };
                         }
@@ -7447,6 +7448,10 @@ window.addEventListener("load", function () {
                                                         var elem = parent.querySelector("#game-wait") as HTMLElement;
                                                         resetForElement(parent, elem);
                                                     } else {
+                                                        if (onlineConnection.autoJoin) {
+                                                            onlineConnection.autoJoin = false;
+                                                            onlineConnection.send("start");
+                                                        }
                                                         notify("#canvas-notifier", getString("appScreenTeamplayTeammateReady", "?"), NotificationPriority.Default, 1000, null, null, client.height);
                                                     }
                                                     break;
@@ -7703,7 +7708,10 @@ window.addEventListener("load", function () {
                     onlineConnection.gameKey = getQueryStringValue("key");
                     const playername = getQueryStringValue("playername");
                     if (playername) {
+                        onlineConnection.autoJoin = true;
                         sessionStorage.setItem("playername", onlineConnection.escapePlayername(playername));
+                    } else {
+                        onlineConnection.autoJoin = false;
                     }
                     (document.getElementById("setup") as HTMLElement).onmousemove = function (event) {
                         (document.getElementById("setup-ball") as HTMLElement).style.left = event.pageX + "px";
