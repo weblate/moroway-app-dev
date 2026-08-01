@@ -6323,6 +6323,9 @@ function init(state: "load" | "reload" = "reload") {
 
     //Default multiplayer mode
     onlineConnection = {
+        escapePlayername(name: string) {
+            return name.replace(/[^a-zA-Z0-9]/g, "");
+        },
         send(mode: string, message?: string) {
             if (onlineConnection.socket && onlineConnection.socket.readyState == WebSocket.OPEN) {
                 onlineConnection.socket.send(
@@ -7137,14 +7140,16 @@ window.addEventListener("load", function () {
                             };
                         }
                         function getPlayerNameFromInput() {
-                            var elem = document.querySelector("#setup-init-name") as HTMLInputElement;
-                            var name = elem.value;
-                            var nameCheck = name.replace(/[^a-zA-Z0-9]/g, "");
-                            if (name.length > 0 && name == nameCheck) {
-                                sessionStorage.setItem("playername", name);
-                                return name;
-                            } else {
-                                elem.value = nameCheck;
+                            const elem = document.querySelector("#setup-init-name") as HTMLInputElement;
+                            if (elem) {
+                                const name = elem.value;
+                                const nameCheck = onlineConnection.escapePlayername(name);
+                                if (name.length > 0 && name == nameCheck) {
+                                    sessionStorage.setItem("playername", name);
+                                    return name;
+                                } else {
+                                    elem.value = nameCheck;
+                                }
                             }
                             return false;
                         }
@@ -7696,6 +7701,10 @@ window.addEventListener("load", function () {
                     };
                     onlineConnection.gameId = getQueryStringValue("id");
                     onlineConnection.gameKey = getQueryStringValue("key");
+                    const playername = getQueryStringValue("playername");
+                    if (playername) {
+                        sessionStorage.setItem("playername", onlineConnection.escapePlayername(playername));
+                    }
                     (document.getElementById("setup") as HTMLElement).onmousemove = function (event) {
                         (document.getElementById("setup-ball") as HTMLElement).style.left = event.pageX + "px";
                         (document.getElementById("setup-ball") as HTMLElement).style.top = event.pageY + "px";

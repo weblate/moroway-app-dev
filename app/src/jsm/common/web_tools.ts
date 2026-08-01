@@ -7,7 +7,7 @@ export { followLink } from "{{jsm_platform}}/common/web_tools.js";
 //HANDLE QUERY String
 export function getQueryStringValue(key: string): string {
     var value = "";
-    window.location.search
+    decodeURIComponent(window.location.search)
         .substring(1)
         .split("&")
         .forEach(function (part) {

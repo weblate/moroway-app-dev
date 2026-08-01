@@ -1,5 +1,5 @@
 version=10.3.14
-beta=2
+beta=3
 sharelink=https://app.moroway.de/{{0}}/{{1}}
 serverlink=herrmann-engel.de/projekte/moroway/moroway-app/server
 web:app_self_link=https://herrmann-engel.de/projekte/moroway/moroway-app/app
