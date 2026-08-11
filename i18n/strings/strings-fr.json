@@ -328,7 +328,6 @@
 	"optDesc_morowayApp_showNotifications": "Affiche les notifications textuelles à l’écran.",
 	"optDesc_morowayApp_startDemoMode": "Entre directement dans le mode de démonstration au démarrage de l’application.",
 	"optInfo_morowayApp_alwaysShowSelectedTrain": "Nécessite « IU classique ». Ne fonctionne pas sur les petits écrans.",
-	"optInfo_morowayApp_burnTheTaxOffice": "Nécessite vue 2D.",
 	"optInfo_morowayApp_classicUI": "Nécessite vue 2D.",
 	"optInfo_morowayApp_cursorascircle": "Ne fonctionne pas sur les écrans tactiles. Nécessite une vue 2D.",
 	"optInfo_morowayApp_saveGame": "Ignoré dans les jeux multijoueurs.",
