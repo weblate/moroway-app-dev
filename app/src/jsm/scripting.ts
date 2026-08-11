@@ -143,6 +143,7 @@ interface Background3D {
     flat: BackgroundObject3D;
     three: BackgroundObject3D;
     aquarium: CanvasObject3D;
+    burningBuilding: CanvasObject3D;
     behind?: HTMLCanvasElement;
     behindClone?: HTMLCanvasElement;
     animateBehind?(reset?: boolean, forceFac?: number): void;
@@ -288,6 +289,10 @@ function measureViewSpace() {
     canvasAquarium.style.height = 90 + "px";
     canvasAquarium.width = 606;
     canvasAquarium.height = 90;
+    canvasBurningBuildung.style.width = 300 + "px";
+    canvasBurningBuildung.style.height = 300 + "px";
+    canvasBurningBuildung.width = 300;
+    canvasBurningBuildung.height = 300;
 }
 
 function drawImage(pic: CanvasImageSource, x: number, y: number, width: number, height: number, cxt: CanvasRenderingContext2D = context, sx: number | undefined = undefined, sy: number | undefined = undefined, sWidth: number | undefined = undefined, sHeight: number | undefined = undefined) {
@@ -1874,9 +1879,10 @@ function requestResize() {
         calcControlCenter();
         three.followCamControls.recalc();
 
-        if (background3D.flat && background3D.flat.resize) background3D.flat.resize();
-        if (background3D.three && background3D.three.resize) background3D.three.resize();
-        if (background3D.aquarium && background3D.aquarium.resize) background3D.aquarium.resize();
+        if (background3D.flat?.resize) background3D.flat.resize();
+        if (background3D.three?.resize) background3D.three.resize();
+        if (background3D.aquarium?.resize) background3D.aquarium.resize();
+        if (background3D.burningBuilding?.resize) background3D.burningBuilding.resize();
         cars3D.forEach(function (car) {
             if (car.resize) {
                 car.resize();
@@ -2653,13 +2659,13 @@ function drawObjects() {
         contextForeground.restore();
     }
 
-    function drawAquarium() {
+    function drawAquarium3D() {
         function avoidFishCollision() {
             var collision = true;
             while (collision) {
                 collision = false;
-                aquarium.fish.forEach((tFish) => {
-                    aquarium.fish.forEach((oFish) => {
+                aquarium3D.fish.forEach((tFish) => {
+                    aquarium3D.fish.forEach((oFish) => {
                         if ((tFish.x > oFish.x && tFish.x < oFish.x + oFish.width && tFish.y > oFish.y && tFish.y < oFish.y + oFish.height) || (tFish.x + tFish.width > oFish.x && tFish.x + tFish.width < oFish.x + oFish.width && tFish.y > oFish.y && tFish.y < oFish.y + oFish.height) || (tFish.x > oFish.x && tFish.x < oFish.x + oFish.width && tFish.y + tFish.height > oFish.y && tFish.y + tFish.height < oFish.y + oFish.height) || (tFish.x + tFish.width > oFish.x && tFish.x + tFish.width < oFish.x + oFish.width && tFish.y + tFish.height > oFish.y && tFish.y + tFish.height < oFish.y + oFish.height)) {
                             collision = true;
                             var newMove;
@@ -2681,28 +2687,48 @@ function drawObjects() {
         }
         contextAquarium.clearRect(0, 0, canvasAquarium.width, canvasAquarium.height);
         contextAquarium.setTransform(1, 0, 0, 1, 0, 0);
-        if (pics[aquarium.backSrc].height / pics[aquarium.backSrc].width > canvasAquarium.height / canvasAquarium.width) {
-            drawImage(pics[aquarium.backSrc], 0, (canvasAquarium.height - canvasAquarium.width * (pics[aquarium.backSrc].height / pics[aquarium.backSrc].width)) / 2, canvasAquarium.width, canvasAquarium.width * (pics[aquarium.backSrc].height / pics[aquarium.backSrc].width), contextAquarium);
+        if (pics[aquarium3D.backSrc].height / pics[aquarium3D.backSrc].width > canvasAquarium.height / canvasAquarium.width) {
+            drawImage(pics[aquarium3D.backSrc], 0, (canvasAquarium.height - canvasAquarium.width * (pics[aquarium3D.backSrc].height / pics[aquarium3D.backSrc].width)) / 2, canvasAquarium.width, canvasAquarium.width * (pics[aquarium3D.backSrc].height / pics[aquarium3D.backSrc].width), contextAquarium);
         } else {
-            drawImage(pics[aquarium.backSrc], (canvasAquarium.width - canvasAquarium.height * (pics[aquarium.backSrc].width / pics[aquarium.backSrc].height)) / 2, 0, canvasAquarium.height * (pics[aquarium.backSrc].width / pics[aquarium.backSrc].height), canvasAquarium.height, contextAquarium);
+            drawImage(pics[aquarium3D.backSrc], (canvasAquarium.width - canvasAquarium.height * (pics[aquarium3D.backSrc].width / pics[aquarium3D.backSrc].height)) / 2, 0, canvasAquarium.height * (pics[aquarium3D.backSrc].width / pics[aquarium3D.backSrc].height), canvasAquarium.height, contextAquarium);
         }
-        for (var i = 0; i < aquarium.fish.length; i++) {
-            if (!aquarium.fish[i].width) {
-                aquarium.fish[i].speed = canvasAquarium.width / 400 + (canvasAquarium.width * Math.random()) / 200;
-                aquarium.fish[i].width = canvasAquarium.width * 0.06 + canvasAquarium.width * 0.02 * Math.random();
-                aquarium.fish[i].height = aquarium.fish[i].width * (pics[aquarium.fish[i].src].height / pics[aquarium.fish[i].src].width);
-                aquarium.fish[i].x = -aquarium.fish[i].width;
-                aquarium.fish[i].y = (canvasAquarium.height - aquarium.fish[i].height) * Math.random();
-            } else if (aquarium.fish[i].x >= canvasAquarium.width) {
-                delete aquarium.fish[i].width;
+        for (var i = 0; i < aquarium3D.fish.length; i++) {
+            if (!aquarium3D.fish[i].width) {
+                aquarium3D.fish[i].speed = canvasAquarium.width / 400 + (canvasAquarium.width * Math.random()) / 200;
+                aquarium3D.fish[i].width = canvasAquarium.width * 0.06 + canvasAquarium.width * 0.02 * Math.random();
+                aquarium3D.fish[i].height = aquarium3D.fish[i].width * (pics[aquarium3D.fish[i].src].height / pics[aquarium3D.fish[i].src].width);
+                aquarium3D.fish[i].x = -aquarium3D.fish[i].width;
+                aquarium3D.fish[i].y = (canvasAquarium.height - aquarium3D.fish[i].height) * Math.random();
+            } else if (aquarium3D.fish[i].x >= canvasAquarium.width) {
+                delete aquarium3D.fish[i].width;
             } else {
-                aquarium.fish[i].x += aquarium.fish[i].speed + (canvasAquarium.width * Math.random()) / 400;
+                aquarium3D.fish[i].x += aquarium3D.fish[i].speed + (canvasAquarium.width * Math.random()) / 400;
             }
         }
         avoidFishCollision();
-        for (var i = 0; i < aquarium.fish.length; i++) {
-            drawImage(pics[aquarium.fish[i].src], aquarium.fish[i].x, aquarium.fish[i].y, aquarium.fish[i].width, aquarium.fish[i].height, contextAquarium);
+        for (var i = 0; i < aquarium3D.fish.length; i++) {
+            drawImage(pics[aquarium3D.fish[i].src], aquarium3D.fish[i].x, aquarium3D.fish[i].y, aquarium3D.fish[i].width, aquarium3D.fish[i].height, contextAquarium);
         }
+        return true;
+    }
+
+    function drawBurningBuilding3D() {
+        var update = false;
+        contextBurningBuildung.clearRect(0, 0, canvasBurningBuildung.width, canvasBurningBuildung.height);
+        contextBurningBuildung.save();
+        if (!burningBuilding3D.colorRedPosition || frameNo % 10 === 0) {
+            update = true;
+            burningBuilding3D.colorRedPosition = Math.random();
+            contextBurningBuildung.rotate(Math.random() * Math.PI);
+        }
+        const gradient = contextBurningBuildung.createLinearGradient(0, 0, canvasBurningBuildung.width, canvasBurningBuildung.height);
+        gradient.addColorStop(0, "black");
+        gradient.addColorStop(burningBuilding3D.colorRedPosition, "darkRed");
+        gradient.addColorStop(1, "black");
+        contextBurningBuildung.fillStyle = gradient;
+        contextBurningBuildung.fillRect(0, 0, canvasBurningBuildung.width, canvasBurningBuildung.height);
+        contextBurningBuildung.restore();
+        return update;
     }
 
     function adjustScaleX(x) {
@@ -2736,10 +2762,11 @@ function drawObjects() {
         }
     }
     hardware.mouse.cursor = hardware.mouse.isDrag ? "move" : "default";
+    canvasAquarium.style.display = "none";
+    canvasBurningBuildung.style.display = "none";
     if (gui.three) {
         /////THREE.JS/////
         canvasGesture.style.display = "none";
-        canvasAquarium.style.display = "";
         canvasBackground.style.display = "none";
         canvas.style.display = "none";
         canvasSemiForeground.style.display = "none";
@@ -2754,11 +2781,17 @@ function drawObjects() {
         if (three.cameraMode == ThreeCameraModes.BIRDS_EYE) {
             background3D.animateBehind();
         }
-        drawAquarium();
-        if (background3D.aquarium.canvas) background3D.aquarium.canvas.needsUpdate = true;
+        if (getSetting("burnTheTaxOffice")) {
+            if (background3D.aquarium?.canvas) background3D.aquarium.canvas.needsUpdate = drawAquarium3D();
+            if (background3D.aquarium?.mesh) background3D.aquarium.mesh.visible = true;
+            if (background3D.burningBuilding?.canvas) background3D.burningBuilding.canvas.needsUpdate = drawBurningBuilding3D();
+            if (background3D.burningBuilding?.mesh) background3D.burningBuilding.mesh.visible = true;
+        } else {
+            if (background3D.aquarium?.mesh) background3D.aquarium.mesh.visible = false;
+            if (background3D.burningBuilding?.mesh) background3D.burningBuilding.mesh.visible = false;
+        }
     } else {
         canvasGesture.style.display = "";
-        canvasAquarium.style.display = "none";
         canvasBackground.style.display = "";
         canvas.style.display = "";
         canvasSemiForeground.style.display = "";
@@ -4718,8 +4751,9 @@ const doubleClickWaitTime = doubleClickTime + 50;
 
 //Background
 const background: Background = {src: 9, secondLayer: 10};
-const background3D: Background3D = {flat: {src: "background-flat"}, three: {src: "background-3d"}, aquarium: {}};
-const aquarium: any = {backSrc: 40, fish: [{src: 41}, {src: 41}, {src: 41}, {src: 42}, {src: 42}, {src: 43}]};
+const background3D: Background3D = {flat: {src: "background-flat"}, three: {src: "background-3d"}, aquarium: {}, burningBuilding: {}};
+const aquarium3D: any = {backSrc: 40, fish: [{src: 41}, {src: 41}, {src: 41}, {src: 42}, {src: 42}, {src: 43}]};
+const burningBuilding3D: any = {};
 
 //Loading animation
 const loadingAnimation: LoadingAnimation = {
@@ -5617,12 +5651,14 @@ const carActions = {
 var canvas: HTMLCanvasElement;
 var canvasGesture: HTMLCanvasElement;
 var canvasAquarium: HTMLCanvasElement;
+var canvasBurningBuildung: HTMLCanvasElement;
 var canvasBackground: HTMLCanvasElement;
 var canvasSemiForeground: HTMLCanvasElement;
 var canvasForeground: HTMLCanvasElement;
 var context: CanvasRenderingContext2D;
 var contextGesture: CanvasRenderingContext2D;
 var contextAquarium: CanvasRenderingContext2D;
+var contextBurningBuildung: CanvasRenderingContext2D;
 var contextBackground: CanvasRenderingContext2D;
 var contextSemiForeground: CanvasRenderingContext2D;
 var contextForeground: CanvasRenderingContext2D;
@@ -6880,6 +6916,18 @@ function init(state: "load" | "reload" = "reload") {
     };
     background3D.aquarium.resize();
     three.mainGroup.add(background3D.aquarium.mesh);
+    background3D.burningBuilding.canvas = new THREE.CanvasTexture(canvasBurningBuildung);
+    background3D.burningBuilding.mesh = new THREE.Mesh(new THREE.BoxGeometry(1.53, 0.8, 0.55), new THREE.MeshPhysicalMaterial({map: background3D.burningBuilding.canvas}));
+    background3D.burningBuilding.resize = function () {
+        const scale = three.calcScale();
+        background3D.burningBuilding.mesh.scale.x = scale / 18;
+        background3D.burningBuilding.mesh.scale.y = scale / 18;
+        background3D.burningBuilding.mesh.scale.z = scale / 18;
+        background3D.burningBuilding.mesh.rotation.x = Math.PI / 2;
+        background3D.burningBuilding.mesh.position.set(-scale * 0.383, three.calcPositionY() + scale * 0.07, new THREE.Box3().setFromObject(background3D.burningBuilding.mesh).getSize(new THREE.Vector3()).z / 2);
+    };
+    background3D.burningBuilding.resize();
+    three.mainGroup.add(background3D.burningBuilding.mesh);
     if (state == "load") {
         background3D.behind = document.getElementById("game-gameplay-three-bg") as HTMLCanvasElement;
         background3D.animateBehind = function (reset = false, forceFac = undefined) {
@@ -8450,12 +8498,14 @@ window.addEventListener("load", function () {
     canvas = document.querySelector("canvas#game-gameplay-main");
     canvasGesture = document.querySelector("canvas#game-gameplay-gesture");
     canvasAquarium = document.querySelector("canvas#game-gameplay-aquarium");
+    canvasBurningBuildung = document.querySelector("canvas#game-gameplay-burning-building");
     canvasBackground = document.querySelector("canvas#game-gameplay-bg");
     canvasSemiForeground = document.querySelector("canvas#game-gameplay-sfg");
     canvasForeground = document.querySelector("canvas#game-gameplay-fg");
     context = canvas.getContext("2d");
     contextGesture = canvasGesture.getContext("2d");
     contextAquarium = canvasAquarium.getContext("2d");
+    contextBurningBuildung = canvasBurningBuildung.getContext("2d");
     contextBackground = canvasBackground.getContext("2d");
     contextSemiForeground = canvasSemiForeground.getContext("2d");
     contextForeground = canvasForeground.getContext("2d");
