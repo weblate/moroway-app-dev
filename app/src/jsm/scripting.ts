@@ -136,9 +136,13 @@ interface Background {
 interface BackgroundObject3D extends Object3D {
     src: string;
 }
+interface CanvasObject3D extends Object3D {
+    canvas?: any;
+}
 interface Background3D {
     flat: BackgroundObject3D;
     three: BackgroundObject3D;
+    aquarium: CanvasObject3D;
     behind?: HTMLCanvasElement;
     behindClone?: HTMLCanvasElement;
     animateBehind?(reset?: boolean, forceFac?: number): void;
@@ -280,6 +284,10 @@ function measureViewSpace() {
     canvasForeground.style.height = canvasSemiForeground.style.height = canvasBackground.style.height = canvasGesture.style.height = canvas.style.height = client.height + "px";
     canvasForeground.width = canvasSemiForeground.width = canvasBackground.width = canvasGesture.width = canvas.width = client.width * client.devicePixelRatio;
     canvasForeground.height = canvasSemiForeground.height = canvasBackground.height = canvasGesture.height = canvas.height = client.height * client.devicePixelRatio;
+    canvasAquarium.style.width = 606 + "px";
+    canvasAquarium.style.height = 90 + "px";
+    canvasAquarium.width = 606;
+    canvasAquarium.height = 90;
 }
 
 function drawImage(pic: CanvasImageSource, x: number, y: number, width: number, height: number, cxt: CanvasRenderingContext2D = context, sx: number | undefined = undefined, sy: number | undefined = undefined, sWidth: number | undefined = undefined, sHeight: number | undefined = undefined) {
@@ -1868,6 +1876,7 @@ function requestResize() {
 
         if (background3D.flat && background3D.flat.resize) background3D.flat.resize();
         if (background3D.three && background3D.three.resize) background3D.three.resize();
+        if (background3D.aquarium && background3D.aquarium.resize) background3D.aquarium.resize();
         cars3D.forEach(function (car) {
             if (car.resize) {
                 car.resize();
@@ -2644,6 +2653,58 @@ function drawObjects() {
         contextForeground.restore();
     }
 
+    function drawAquarium() {
+        function avoidFishCollision() {
+            var collision = true;
+            while (collision) {
+                collision = false;
+                aquarium.fish.forEach((tFish) => {
+                    aquarium.fish.forEach((oFish) => {
+                        if ((tFish.x > oFish.x && tFish.x < oFish.x + oFish.width && tFish.y > oFish.y && tFish.y < oFish.y + oFish.height) || (tFish.x + tFish.width > oFish.x && tFish.x + tFish.width < oFish.x + oFish.width && tFish.y > oFish.y && tFish.y < oFish.y + oFish.height) || (tFish.x > oFish.x && tFish.x < oFish.x + oFish.width && tFish.y + tFish.height > oFish.y && tFish.y + tFish.height < oFish.y + oFish.height) || (tFish.x + tFish.width > oFish.x && tFish.x + tFish.width < oFish.x + oFish.width && tFish.y + tFish.height > oFish.y && tFish.y + tFish.height < oFish.y + oFish.height)) {
+                            collision = true;
+                            var newMove;
+                            if (tFish.x > oFish.x) {
+                                newMove = oFish.width + (Math.random() * tFish.width) / 200;
+                                tFish.x += newMove;
+                                tFish.moveX += newMove;
+                                tFish.speed += (newMove - tFish.speed) / 16;
+                            } else {
+                                newMove = tFish.width + (Math.random() * oFish.width) / 200;
+                                oFish.x += newMove;
+                                oFish.moveX += newMove;
+                                oFish.speed += (newMove - oFish.speed) / 16;
+                            }
+                        }
+                    });
+                });
+            }
+        }
+        contextAquarium.clearRect(0, 0, canvasAquarium.width, canvasAquarium.height);
+        contextAquarium.setTransform(1, 0, 0, 1, 0, 0);
+        if (pics[aquarium.backSrc].height / pics[aquarium.backSrc].width > canvasAquarium.height / canvasAquarium.width) {
+            drawImage(pics[aquarium.backSrc], 0, (canvasAquarium.height - canvasAquarium.width * (pics[aquarium.backSrc].height / pics[aquarium.backSrc].width)) / 2, canvasAquarium.width, canvasAquarium.width * (pics[aquarium.backSrc].height / pics[aquarium.backSrc].width), contextAquarium);
+        } else {
+            drawImage(pics[aquarium.backSrc], (canvasAquarium.width - canvasAquarium.height * (pics[aquarium.backSrc].width / pics[aquarium.backSrc].height)) / 2, 0, canvasAquarium.height * (pics[aquarium.backSrc].width / pics[aquarium.backSrc].height), canvasAquarium.height, contextAquarium);
+        }
+        for (var i = 0; i < aquarium.fish.length; i++) {
+            if (!aquarium.fish[i].width) {
+                aquarium.fish[i].speed = canvasAquarium.width / 400 + (canvasAquarium.width * Math.random()) / 200;
+                aquarium.fish[i].width = canvasAquarium.width * 0.06 + canvasAquarium.width * 0.02 * Math.random();
+                aquarium.fish[i].height = aquarium.fish[i].width * (pics[aquarium.fish[i].src].height / pics[aquarium.fish[i].src].width);
+                aquarium.fish[i].x = -aquarium.fish[i].width;
+                aquarium.fish[i].y = (canvasAquarium.height - aquarium.fish[i].height) * Math.random();
+            } else if (aquarium.fish[i].x >= canvasAquarium.width) {
+                delete aquarium.fish[i].width;
+            } else {
+                aquarium.fish[i].x += aquarium.fish[i].speed + (canvasAquarium.width * Math.random()) / 400;
+            }
+        }
+        avoidFishCollision();
+        for (var i = 0; i < aquarium.fish.length; i++) {
+            drawImage(pics[aquarium.fish[i].src], aquarium.fish[i].x, aquarium.fish[i].y, aquarium.fish[i].width, aquarium.fish[i].height, contextAquarium);
+        }
+    }
+
     function adjustScaleX(x) {
         return ((canvas.width * client.zoomAndTilt.realScale) / 2 - canvas.width / 2) / client.zoomAndTilt.realScale + x / client.zoomAndTilt.realScale - client.zoomAndTilt.offsetX / client.zoomAndTilt.realScale;
     }
@@ -2678,6 +2739,7 @@ function drawObjects() {
     if (gui.three) {
         /////THREE.JS/////
         canvasGesture.style.display = "none";
+        canvasAquarium.style.display = "";
         canvasBackground.style.display = "none";
         canvas.style.display = "none";
         canvasSemiForeground.style.display = "none";
@@ -2692,8 +2754,11 @@ function drawObjects() {
         if (three.cameraMode == ThreeCameraModes.BIRDS_EYE) {
             background3D.animateBehind();
         }
+        drawAquarium();
+        if (background3D.aquarium.canvas) background3D.aquarium.canvas.needsUpdate = true;
     } else {
         canvasGesture.style.display = "";
+        canvasAquarium.style.display = "none";
         canvasBackground.style.display = "";
         canvas.style.display = "";
         canvasSemiForeground.style.display = "";
@@ -4653,7 +4718,8 @@ const doubleClickWaitTime = doubleClickTime + 50;
 
 //Background
 const background: Background = {src: 9, secondLayer: 10};
-const background3D: Background3D = {flat: {src: "background-flat"}, three: {src: "background-3d"}};
+const background3D: Background3D = {flat: {src: "background-flat"}, three: {src: "background-3d"}, aquarium: {}};
+const aquarium: any = {backSrc: 40, fish: [{src: 41}, {src: 41}, {src: 41}, {src: 42}, {src: 42}, {src: 43}]};
 
 //Loading animation
 const loadingAnimation: LoadingAnimation = {
@@ -5550,11 +5616,13 @@ const carActions = {
 //Canvas and drawing
 var canvas: HTMLCanvasElement;
 var canvasGesture: HTMLCanvasElement;
+var canvasAquarium: HTMLCanvasElement;
 var canvasBackground: HTMLCanvasElement;
 var canvasSemiForeground: HTMLCanvasElement;
 var canvasForeground: HTMLCanvasElement;
 var context: CanvasRenderingContext2D;
 var contextGesture: CanvasRenderingContext2D;
+var contextAquarium: CanvasRenderingContext2D;
 var contextBackground: CanvasRenderingContext2D;
 var contextSemiForeground: CanvasRenderingContext2D;
 var contextForeground: CanvasRenderingContext2D;
@@ -6800,6 +6868,18 @@ function init(state: "load" | "reload" = "reload") {
         background3D.three.resize();
         three.mainGroup.add(background3D.three.mesh);
     }
+    background3D.aquarium.canvas = new THREE.CanvasTexture(canvasAquarium);
+    background3D.aquarium.mesh = new THREE.Mesh(new THREE.PlaneGeometry(6.06, 0.9), new THREE.MeshPhysicalMaterial({map: background3D.aquarium.canvas}));
+    background3D.aquarium.resize = function () {
+        const scale = three.calcScale();
+        background3D.aquarium.mesh.scale.x = scale / 40;
+        background3D.aquarium.mesh.scale.y = scale / 40;
+        background3D.aquarium.mesh.scale.z = scale / 40;
+        background3D.aquarium.mesh.rotation.x = Math.PI / 2;
+        background3D.aquarium.mesh.position.set(-scale * 0.067, three.calcPositionY() + scale * 0.093, new THREE.Box3().setFromObject(background3D.aquarium.mesh).getSize(new THREE.Vector3()).z / 2);
+    };
+    background3D.aquarium.resize();
+    three.mainGroup.add(background3D.aquarium.mesh);
     if (state == "load") {
         background3D.behind = document.getElementById("game-gameplay-three-bg") as HTMLCanvasElement;
         background3D.animateBehind = function (reset = false, forceFac = undefined) {
@@ -8369,11 +8449,13 @@ window.addEventListener("load", function () {
     //Initialize canvases and contexts
     canvas = document.querySelector("canvas#game-gameplay-main");
     canvasGesture = document.querySelector("canvas#game-gameplay-gesture");
+    canvasAquarium = document.querySelector("canvas#game-gameplay-aquarium");
     canvasBackground = document.querySelector("canvas#game-gameplay-bg");
     canvasSemiForeground = document.querySelector("canvas#game-gameplay-sfg");
     canvasForeground = document.querySelector("canvas#game-gameplay-fg");
     context = canvas.getContext("2d");
     contextGesture = canvasGesture.getContext("2d");
+    contextAquarium = canvasAquarium.getContext("2d");
     contextBackground = canvasBackground.getContext("2d");
     contextSemiForeground = canvasSemiForeground.getContext("2d");
     contextForeground = canvasForeground.getContext("2d");
@@ -8538,7 +8620,11 @@ window.addEventListener("load", function () {
         {id: 36, extension: "png"},
         {id: 37, extension: "png"},
         {id: 38, extension: "png"},
-        {id: 39, extension: "png"}
+        {id: 39, extension: "png"},
+        {id: 40, extension: "jpg"},
+        {id: 41, extension: "png"},
+        {id: 42, extension: "png"},
+        {id: 43, extension: "png"}
     ];
     pics = [];
     defaultObjects3D.length;

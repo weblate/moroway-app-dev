@@ -1385,6 +1385,26 @@
       }
     },
     {
+      "name": "streetlamp2",
+      "doubleSided": false,
+      "emissiveFactor": [
+        1.00000000000000000000e+00,
+        6.49122807017543879127e-01,
+        1.66666666666666740682e-01
+      ],
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          7.29411764705882315063e-01,
+          5.60784313725490202174e-01,
+          2.62745098039215696506e-01,
+          2.89999999999999980016e-01
+        ],
+        "metallicFactor": 8.19999999999999951150e-01,
+        "roughnessFactor": 4.29999999999999993339e-01
+      },
+      "alphaMode": "BLEND"
+    },
+    {
       "name": "transparent",
       "doubleSided": false,
       "emissiveFactor": [
@@ -4696,7 +4716,14 @@
       "componentType": 5126
     },
     {
-      "count": 600,
+      "count": 162,
+      "type": "SCALAR",
+      "byteOffset": 18768,
+      "bufferView": 130,
+      "componentType": 5125
+    },
+    {
+      "count": 438,
       "type": "SCALAR",
       "byteOffset": 17016,
       "bufferView": 130,
@@ -7700,38 +7727,47 @@
       "primitives": [
         {
           "attributes": {
-            "NORMAL": 382,
-            "POSITION": 381,
-            "COLOR_0": 383
+            "NORMAL": 383,
+            "POSITION": 382,
+            "COLOR_0": 384
           },
           "material": 2,
+          "indices": 381
+        },
+        {
+          "attributes": {
+            "NORMAL": 383,
+            "POSITION": 382,
+            "COLOR_0": 384
+          },
+          "material": 1,
           "indices": 380
         },
         {
           "attributes": {
-            "NORMAL": 382,
-            "POSITION": 381,
-            "COLOR_0": 383
+            "NORMAL": 383,
+            "POSITION": 382,
+            "COLOR_0": 384
           },
-          "material": 1,
+          "material": 26,
           "indices": 379
         },
         {
           "attributes": {
-            "NORMAL": 382,
-            "POSITION": 381,
-            "COLOR_0": 383
+            "NORMAL": 383,
+            "POSITION": 382,
+            "COLOR_0": 384
           },
-          "material": 26,
+          "material": 22,
           "indices": 378
         },
         {
           "attributes": {
-            "NORMAL": 382,
-            "POSITION": 381,
-            "COLOR_0": 383
+            "NORMAL": 383,
+            "POSITION": 382,
+            "COLOR_0": 384
           },
-          "material": 22,
+          "material": 49,
           "indices": 377
         }
       ]
@@ -7741,21 +7777,21 @@
       "primitives": [
         {
           "attributes": {
-            "NORMAL": 387,
-            "POSITION": 386,
-            "COLOR_0": 388
+            "NORMAL": 388,
+            "POSITION": 387,
+            "COLOR_0": 389
           },
           "material": 1,
-          "indices": 385
+          "indices": 386
         },
         {
           "attributes": {
-            "NORMAL": 387,
-            "POSITION": 386,
-            "COLOR_0": 388
+            "NORMAL": 388,
+            "POSITION": 387,
+            "COLOR_0": 389
           },
           "material": 22,
-          "indices": 384
+          "indices": 385
         }
       ]
     },
@@ -7764,21 +7800,21 @@
       "primitives": [
         {
           "attributes": {
-            "NORMAL": 392,
-            "POSITION": 391,
-            "COLOR_0": 393
+            "NORMAL": 393,
+            "POSITION": 392,
+            "COLOR_0": 394
           },
           "material": 1,
-          "indices": 390
+          "indices": 391
         },
         {
           "attributes": {
-            "NORMAL": 392,
-            "POSITION": 391,
-            "COLOR_0": 393
+            "NORMAL": 393,
+            "POSITION": 392,
+            "COLOR_0": 394
           },
           "material": 22,
-          "indices": 389
+          "indices": 390
         }
       ]
     },
@@ -7787,21 +7823,21 @@
       "primitives": [
         {
           "attributes": {
-            "NORMAL": 397,
-            "POSITION": 396,
-            "COLOR_0": 398
+            "NORMAL": 398,
+            "POSITION": 397,
+            "COLOR_0": 399
           },
           "material": 1,
-          "indices": 395
+          "indices": 396
         },
         {
           "attributes": {
-            "NORMAL": 397,
-            "POSITION": 396,
-            "COLOR_0": 398
+            "NORMAL": 398,
+            "POSITION": 397,
+            "COLOR_0": 399
           },
           "material": 22,
-          "indices": 394
+          "indices": 395
         }
       ]
     },
@@ -7810,21 +7846,21 @@
       "primitives": [
         {
           "attributes": {
-            "NORMAL": 402,
-            "POSITION": 401,
-            "COLOR_0": 403
+            "NORMAL": 403,
+            "POSITION": 402,
+            "COLOR_0": 404
           },
           "material": 1,
-          "indices": 400
+          "indices": 401
         },
         {
           "attributes": {
-            "NORMAL": 402,
-            "POSITION": 401,
-            "COLOR_0": 403
+            "NORMAL": 403,
+            "POSITION": 402,
+            "COLOR_0": 404
           },
           "material": 22,
-          "indices": 399
+          "indices": 400
         }
       ]
     },
@@ -7833,12 +7869,12 @@
       "primitives": [
         {
           "attributes": {
-            "NORMAL": 406,
-            "POSITION": 405,
-            "TEXCOORD_0": 407
+            "NORMAL": 407,
+            "POSITION": 406,
+            "TEXCOORD_0": 408
           },
-          "material": 49,
-          "indices": 404
+          "material": 50,
+          "indices": 405
         }
       ]
     }
